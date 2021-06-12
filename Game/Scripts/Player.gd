@@ -1,26 +1,31 @@
 extends KinematicBody2D
 
-var G = 10
+var G = 20
 var speed = 300
-var jump_velocity = 400
+var jump_velocity = 500
 var input = Vector2()
 var velocity = Vector2()
 
+var controls_default = { }
+
+var controls_binded = { }
+
 func _ready():
+	controls_default = get_parent().controls_default 
+	controls_binded = get_parent().controls_binded
 	pass 
 
 func get_input ():
-	if Input.is_action_pressed("ui_right"):
-		input.x = 1
-	elif Input.is_action_pressed("ui_left"):
-		input.x = -1
-	else: 
-		input.x = 0
+	input.x = 0
+	
+	var key_array = Array(controls_default.keys())
+	
+	for i in controls_default:
+		if (Input.is_action_pressed(i)):
+			input += controls_default[i]
+			input += controls_default[controls_binded[i]]
 		
-	if Input.is_action_pressed("ui_up") && is_on_floor():
-		input.y = 1
-
-	else: 
+	if !is_on_floor():
 		input.y = 0
 	pass
 
@@ -33,7 +38,5 @@ func _physics_process(delta):
 	elif velocity.y < 0:
 		velocity.y += G
 	
-	
-	velocity = move_and_slide(velocity, Vector2.UP)
-	
+	velocity = move_and_slide(velocity, Vector2.UP)	
 	pass
