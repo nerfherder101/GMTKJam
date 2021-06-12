@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/cables.png-22d7bf4de1c855b3aeeb932a0413cd68.stex"
+path="res://.import/2.png-49f8efcb3911a47e89b5c6dc86fb4c04.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Img/cables.png"
-dest_files=[ "res://.import/cables.png-22d7bf4de1c855b3aeeb932a0413cd68.stex" ]
+source_file="res://Img/crane/2.png"
+dest_files=[ "res://.import/2.png-49f8efcb3911a47e89b5c6dc86fb4c04.stex" ]
 
 [params]
 
