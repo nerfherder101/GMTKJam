@@ -28,9 +28,15 @@ func get_input (delta):
 	var key_array = Array(controls_default.keys())
 	
 	for i in controls_default:
-		if (Input.is_action_pressed(i)):
-			input += controls_default[i]
-			input += controls_default[controls_binded[i]]
+		if (i != "none"):
+			if (Input.is_action_pressed(i)):
+				input += controls_default[i]
+				input += controls_default[controls_binded[i]]
+				get_node("Camera/Base").press_key(i)
+				get_node("Camera/Base").press_key(controls_binded[i])
+			elif !Input.is_action_pressed(controls_binded[i]):
+				get_node("Camera/Base").unpress_key(i)
+				
 		
 	if !is_on_floor():
 		ground_timer += delta
