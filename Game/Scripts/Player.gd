@@ -4,9 +4,13 @@ var G = 20
 var ACCELERATION = 600
 var FRICTION = 0.25
 var MAX_SPEED = 200
-var jump_velocity = 500
+var jump_velocity = 550
 var input = Vector2()
 var velocity = Vector2()
+
+var ground_timer = 0
+var ground_register_time = 0.1
+var on_ground = true
 
 var controls_default = { }
 
@@ -18,7 +22,7 @@ func _ready():
 	pass 
 
 
-func get_input ():
+func get_input (delta):
 	input.x = 0
 	
 	var key_array = Array(controls_default.keys())
@@ -29,15 +33,23 @@ func get_input ():
 			input += controls_default[controls_binded[i]]
 		
 	if !is_on_floor():
+		ground_timer += delta
+	else:
+		ground_timer = 0
+	
+	if (ground_timer >= ground_register_time):
 		input.y = 0
-		
+	
+	if (input.y > 0):
+		ground_timer = ground_register_time
+	
 	if (Input.is_action_pressed("ui_accept")):
 		get_parent().Spawn_Player()
 		queue_free()
 	pass
 
 func _physics_process(delta):
-	get_input()
+	get_input(delta)
 	
 	if input.x != 0:
 		velocity.x += input.x * ACCELERATION * delta 
