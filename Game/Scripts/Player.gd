@@ -15,6 +15,7 @@ func _ready():
 	controls_binded = get_parent().controls_binded
 	pass 
 
+
 func get_input ():
 	input.x = 0
 	
@@ -27,6 +28,11 @@ func get_input ():
 		
 	if !is_on_floor():
 		input.y = 0
+		
+		
+	if (Input.is_action_pressed("ui_accept")):
+		get_parent().Spawn_Player()
+		queue_free()
 	pass
 
 func _physics_process(delta):

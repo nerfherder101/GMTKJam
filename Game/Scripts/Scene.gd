@@ -1,6 +1,7 @@
 extends Node2D
 
 onready var player_prefab = preload("res://Prefabs//Player.tscn")
+var spawn_pos = Vector2(200,100)
 
 var controls_default = {
 	"ui_right" : Vector2 (1,0),
@@ -20,8 +21,9 @@ func _ready():
 
 func Spawn_Player ():
 	var player = player_prefab.instance()
-	player.position = position + Vector2(200,100)
+	player.position = spawn_pos
 	
 	add_child(player)
 	
 	pass
+
