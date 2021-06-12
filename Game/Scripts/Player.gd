@@ -1,7 +1,9 @@
 extends KinematicBody2D
 
 var G = 20
-var speed = 300
+var ACCELERATION = 600
+var FRICTION = 0.25
+var MAX_SPEED = 200
 var jump_velocity = 500
 var input = Vector2()
 var velocity = Vector2()
@@ -29,7 +31,6 @@ func get_input ():
 	if !is_on_floor():
 		input.y = 0
 		
-		
 	if (Input.is_action_pressed("ui_accept")):
 		get_parent().Spawn_Player()
 		queue_free()
@@ -37,12 +38,17 @@ func get_input ():
 
 func _physics_process(delta):
 	get_input()
-	velocity.x = input.x * speed
+	
+	if input.x != 0:
+		velocity.x += input.x * ACCELERATION * delta 
+		velocity.x = clamp(velocity.x, -MAX_SPEED, MAX_SPEED)
+	else:
+		velocity.x = lerp(velocity.x, 0, FRICTION)
 	
 	if velocity.y >= 0:
 		velocity.y += G - (input.y * jump_velocity)
 	elif velocity.y < 0:
 		velocity.y += G
 	
-	velocity = move_and_slide(velocity, Vector2.UP)	
+	velocity = move_and_slide(velocity, Vector2.UP)
 	pass
