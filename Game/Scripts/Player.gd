@@ -6,19 +6,13 @@ var jump_velocity = 500
 var input = Vector2()
 var velocity = Vector2()
 
-var controls_default = {
-	"ui_right" : Vector2 (1,0),
-	"ui_left" : Vector2 (-1,0),
-	"ui_up" : Vector2 (0,1)
-}
+var controls_default = { }
 
-var controls_binded = {
-	"ui_right" : "ui_right",
-	"ui_left" :  "ui_up",
-	"ui_up" : "ui_left"
-}
+var controls_binded = { }
 
 func _ready():
+	controls_default = get_parent().controls_default 
+	controls_binded = get_parent().controls_binded
 	pass 
 
 func get_input ():
@@ -44,7 +38,5 @@ func _physics_process(delta):
 	elif velocity.y < 0:
 		velocity.y += G
 	
-	
-	velocity = move_and_slide(velocity, Vector2.UP)
-	
+	velocity = move_and_slide(velocity, Vector2.UP)	
 	pass
