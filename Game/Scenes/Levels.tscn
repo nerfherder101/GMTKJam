@@ -25,7 +25,7 @@ cell_size = Vector2( 32, 32 )
 cell_custom_transform = Transform2D( 0, 0, 0, 0, 0, 0 )
 show_collision = true
 format = 1
-tile_data = PoolIntArray( -5, 10, 0, 65533, 10, 0, 131069, 10, 0, 196605, 10, 0, 524298, 10, 1, 524299, 10, 2, 524300, 10, 0 )
+tile_data = PoolIntArray( 65532, 10, 0, 131068, 10, 65536, 196603, 10, 196609, 196604, 10, 131073, 196605, 10, 196608, 524298, 10, 1, 524299, 10, 2, 524300, 10, 0 )
 
 [node name="Spawn" type="Area2D" parent="."]
 collision_layer = 0
