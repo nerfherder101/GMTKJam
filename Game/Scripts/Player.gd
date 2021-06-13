@@ -1,9 +1,9 @@
 extends KinematicBody2D
 
 var G = 20
-var ACCELERATION = 600
+var ACCELERATION = 700
 var FRICTION = 0.25
-var MAX_SPEED = 200
+var MAX_SPEED = 300
 var jump_velocity = 550
 var input = Vector2()
 var velocity = Vector2()
@@ -35,12 +35,16 @@ func get_input (delta):
 	for i in controls_default:
 		if (i != "none"):
 			if (Input.is_action_pressed(i)):
+				if (controls_binded[i] == "death"):
+					Die()
+					break
 				input += controls_default[i]
 				input += controls_default[controls_binded[i]]
-				get_tree().get_current_scene().get_node("HUD/Base").press_key(i)
-				get_tree().get_current_scene().get_node("HUD/Base").press_key(controls_binded[i])
+				get_tree().get_current_scene().get_node("HUD").get_child(0).press_key(i)
+				get_tree().get_current_scene().get_node("HUD").get_child(0).press_key(controls_binded[i])
 			elif !Input.is_action_pressed(controls_binded[i]):
-				get_tree().get_current_scene().get_node("HUD/Base").unpress_key(i)
+				if get_tree().get_current_scene().get_node("HUD").get_child(0) != null:
+					get_tree().get_current_scene().get_node("HUD").get_child(0).unpress_key(i)
 				
 		
 	if !is_on_floor():

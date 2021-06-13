@@ -11,9 +11,9 @@ var controls_default = {
 }
 
 var controls_binded = {
-	"ui_right" : "none",
-	"ui_left" :  "ui_up",
-	"ui_up" : "ui_left"
+	"ui_right" : "ui_up",
+	"ui_left" :  "none",
+	"ui_up" : "ui_right"
 }
 
 func _ready():

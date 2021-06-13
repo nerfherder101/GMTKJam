@@ -15,7 +15,7 @@ _global_script_class_icons={
 [application]
 
 config/name="GMTK Jam"
-run/main_scene="res://Scenes/Testing.tscn"
+run/main_scene="res://Scenes/Levels.tscn"
 config/icon="res://icon.png"
 
 [importer_defaults]
