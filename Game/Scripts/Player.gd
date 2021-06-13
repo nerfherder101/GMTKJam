@@ -8,6 +8,8 @@ var jump_velocity = 550
 var input = Vector2()
 var velocity = Vector2()
 
+var dead = false
+
 var ground_timer = 0
 var ground_register_time = 0.1
 var on_ground = true
@@ -19,6 +21,9 @@ var controls_binded = { }
 func _ready():
 	controls_default = get_parent().controls_default 
 	controls_binded = get_parent().controls_binded
+	
+	get_node("Camera").current = true
+	
 	pass 
 
 
@@ -69,4 +74,22 @@ func _physics_process(delta):
 		velocity.y += G
 	
 	velocity = move_and_slide(velocity, Vector2.UP)
+	
+	CheckCollisions()
 	pass
+
+func CheckCollisions ():
+	for i in get_slide_count():
+		var collision = get_slide_collision(i)
+		if (collision.collider.name == "Hazards" && !dead):
+			dead = true
+			Die()
+	pass
+
+func Die ():
+	get_parent().Spawn_Player()
+	queue_free()
+	pass
+
+
+
