@@ -11,7 +11,6 @@ var jump_velocity = 550
 var input = Vector2()
 var velocity = Vector2()
 
-var dead = false
 
 var ground_timer = 0
 var ground_register_time = 0.1
@@ -21,7 +20,10 @@ var controls_default = { }
 
 var controls_binded = { }
 
+onready var anim = self.get_node("AnimatedSprite");
+
 #death vars:
+var dead = false
 onready var crane_prefab = preload("res://Prefabs//Crane.tscn")
 onready var crane = crane_prefab.instance()
 onready var crane_animator = crane.get_node("AnimatedSprite")
@@ -85,6 +87,7 @@ func _physics_process(delta):
 	
 	#play crane animation for death.
 	if (dead and !grabbed_by_crane):
+		anim.play("default")
 		crane_animator.play("moving_right")
 		#crane moves on X axis to player.
 		death_animation_time_x += delta
@@ -112,6 +115,9 @@ func _physics_process(delta):
 		self.position.y -= delta * 2
 		#make a fade out happen here. Only needs to last 1 second or so
 	
+	#end crane animation / death section.
+	##############################################
+	
 	get_input(delta)
 	
 	if input.x != 0:
@@ -124,6 +130,17 @@ func _physics_process(delta):
 		velocity.y += G - (input.y * jump_velocity)
 	elif velocity.y < 0:
 		velocity.y += G
+	
+	# walk animation and sprite direction.
+	if (velocity.x > 1):
+		anim.play("walking")
+		anim.set_scale(Vector2(sign(-1), 1))
+	elif (velocity.x < -1):
+		anim.play("walking")
+		anim.set_scale(Vector2(sign(1), 1))
+		
+	else:
+		anim.play("default")
 	
 	velocity = move_and_slide(velocity, Vector2.UP)
 	
