@@ -19,11 +19,6 @@ animations = [ {
 "name": "stopping",
 "speed": 5.0
 }, {
-"frames": [ ExtResource( 3 ) ],
-"loop": true,
-"name": "descending",
-"speed": 5.0
-}, {
 "frames": [ ExtResource( 2 ) ],
 "loop": true,
 "name": "moving_right",
@@ -32,6 +27,11 @@ animations = [ {
 "frames": [ ExtResource( 4 ), ExtResource( 5 ), ExtResource( 3 ) ],
 "loop": false,
 "name": "grabbing",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 3 ) ],
+"loop": true,
+"name": "descending",
 "speed": 5.0
 } ]
 

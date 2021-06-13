@@ -42,11 +42,6 @@ shape = SubResource( 1 )
 [node name="Spawn2" type="Area2D" parent="."]
 collision_layer = 0
 script = ExtResource( 5 )
-controls_binded = {
-"ui_left": "none",
-"ui_right": "death",
-"ui_up": "none"
-}
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Spawn2"]
 position = Vector2( 539.37, 254.362 )

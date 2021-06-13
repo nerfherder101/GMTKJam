@@ -1,5 +1,8 @@
 extends KinematicBody2D
 
+
+
+
 var G = 20
 var ACCELERATION = 700
 var FRICTION = 0.25
@@ -18,11 +21,26 @@ var controls_default = { }
 
 var controls_binded = { }
 
+#death vars:
+onready var crane_prefab = preload("res://Prefabs//Crane.tscn")
+onready var crane = crane_prefab.instance()
+onready var crane_animator = crane.get_node("AnimatedSprite")
+var player_head_height_difference = -24
+var death_animation_time_x = 0
+var death_animation_time_y = 0
+var death_animation_duration = 1.20
+var crane_original_position
+var crane_pause_duration = 0.4
+var crane_pause_time = 0
+var grabbed_by_crane = false
+
+var cam = null
+
 func _ready():
 	controls_default = get_parent().controls_default 
 	controls_binded = get_parent().controls_binded
-	
-	get_node("Camera").current = true
+	cam = get_node("Camera")
+	cam.current = true
 	
 	pass 
 
@@ -64,6 +82,36 @@ func get_input (delta):
 	pass
 
 func _physics_process(delta):
+	
+	#play crane animation for death.
+	if (dead and !grabbed_by_crane):
+		crane_animator.play("moving_right")
+		#crane moves on X axis to player.
+		death_animation_time_x += delta
+		crane.position.x = lerp(crane_original_position.x, 0, death_animation_time_x / (death_animation_duration ))
+		#crane pauses for a moment. Plays stop animation
+		if (death_animation_time_x >= death_animation_duration):
+			crane_animator.play("stopping")
+			
+			crane.position.x = 0
+			if (crane_pause_time < crane_pause_duration):
+				crane_pause_time += delta
+			else:
+				crane_animator.play("descending")
+				
+			#crane descends on player.
+				death_animation_time_y += delta
+				crane.position.y = lerp(crane_original_position.y, player_head_height_difference, death_animation_time_y / death_animation_duration)
+				if (death_animation_time_y >= death_animation_duration):
+					crane.position.y = player_head_height_difference
+					crane_animator.play("grabbing")
+					grabbed_by_crane = true
+		return false
+	elif (grabbed_by_crane):
+		#move the player off the screen and then we can put him back to the checkpoint.
+		self.position.y -= delta * 2
+		#make a fade out happen here. Only needs to last 1 second or so
+	
 	get_input(delta)
 	
 	if input.x != 0:
@@ -91,8 +139,15 @@ func CheckCollisions ():
 	pass
 
 func Die ():
-	get_parent().Spawn_Player()
-	queue_free()
+	crane.position = Vector2(-270,-120)
+	crane_original_position = Vector2(-270,-120)
+	add_child(crane)
+	# todo make camera go up a bit and follow the crane down.
+
+	
+	
+	#get_parent().Spawn_Player()
+	#queue_free()
 	pass
 
 
