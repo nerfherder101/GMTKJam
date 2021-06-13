@@ -35,6 +35,13 @@ var crane_original_position
 var crane_pause_duration = 0.4
 var crane_pause_time = 0
 var grabbed_by_crane = false
+var crane_return_time = 0
+var crane_return_duration = 0.8
+onready var transition_screen_prefab = preload("res://Prefabs/Transition.tscn")
+onready var transition_screen = transition_screen_prefab.instance()
+var transition_screen_time = 0
+var transition_screen_duration = 0.4
+
 
 var cam = null
 
@@ -112,9 +119,16 @@ func _physics_process(delta):
 		return false
 	elif (grabbed_by_crane):
 		#move the player off the screen and then we can put him back to the checkpoint.
-		self.position.y -= delta * 2
-		#make a fade out happen here. Only needs to last 1 second or so
-	
+		crane_return_time += delta;
+		self.position.y = lerp (self.position.y, -300, crane_return_time / crane_return_duration)
+		if (crane_return_time > crane_return_duration):
+			#transition_screen.visible = true;
+			var mat = transition_screen.get_material()
+			transition_screen_time += delta
+			mat.set_shader_param("Cutoff", lerp(1, 0, transition_screen_time / transition_screen_duration))
+			
+			#TODO: RESPAWN.
+			
 	#end crane animation / death section.
 	##############################################
 	
@@ -141,7 +155,7 @@ func _physics_process(delta):
 		
 	else:
 		anim.play("default")
-	
+
 	velocity = move_and_slide(velocity, Vector2.UP)
 	
 	CheckCollisions()
@@ -159,8 +173,12 @@ func Die ():
 	crane.position = Vector2(-270,-120)
 	crane_original_position = Vector2(-270,-120)
 	add_child(crane)
+	add_child(transition_screen)
+	#transition_screen.visible = false
+	
+	print ("cam ", cam.get_global_transform())
 	# todo make camera go up a bit and follow the crane down.
-
+	
 	
 	
 	#get_parent().Spawn_Player()
