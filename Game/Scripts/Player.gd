@@ -32,10 +32,10 @@ func get_input (delta):
 			if (Input.is_action_pressed(i)):
 				input += controls_default[i]
 				input += controls_default[controls_binded[i]]
-				get_node("Camera/Base").press_key(i)
-				get_node("Camera/Base").press_key(controls_binded[i])
+				get_tree().get_current_scene().get_node("HUD/Base").press_key(i)
+				get_tree().get_current_scene().get_node("HUD/Base").press_key(controls_binded[i])
 			elif !Input.is_action_pressed(controls_binded[i]):
-				get_node("Camera/Base").unpress_key(i)
+				get_tree().get_current_scene().get_node("HUD/Base").unpress_key(i)
 				
 		
 	if !is_on_floor():

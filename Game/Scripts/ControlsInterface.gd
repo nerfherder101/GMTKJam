@@ -39,7 +39,4 @@ func _ready():
 			11: 
 				controls_location["ui_up"] = tile
 
-func _process(delta):
-	global_position = get_parent().global_position
-
 
