@@ -22,6 +22,7 @@ func _ready():
 func Spawn_Player ():
 	var player = player_prefab.instance()
 	player.position = spawn_pos
+	player.current_respawn_point = spawn_pos
 	
 	add_child(player)
 	

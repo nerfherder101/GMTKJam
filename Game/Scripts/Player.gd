@@ -10,6 +10,7 @@ var MAX_SPEED = 300
 var jump_velocity = 550
 var input = Vector2()
 var velocity = Vector2()
+var current_respawn_point = null;
 
 
 var ground_timer = 0
@@ -22,35 +23,48 @@ var controls_binded = { }
 
 onready var anim = self.get_node("AnimatedSprite");
 
-#death vars:
+var cam = null
+
+
+## Start death vars
 var dead = false
+# Crane
 onready var crane_prefab = preload("res://Prefabs//Crane.tscn")
 onready var crane = crane_prefab.instance()
 onready var crane_animator = crane.get_node("AnimatedSprite")
 var player_head_height_difference = -24
-var death_animation_time_x = 0
-var death_animation_time_y = 0
-var death_animation_duration = 1.20
 var crane_original_position
-var crane_pause_duration = 0.4
-var crane_pause_time = 0
-var grabbed_by_crane = false
-var crane_return_time = 0
-var crane_return_duration = 0.8
+# Transition screen
 onready var transition_screen_prefab = preload("res://Prefabs/Transition.tscn")
 onready var transition_screen = transition_screen_prefab.instance()
-var transition_screen_time = 0
-var transition_screen_duration = 0.4
+# Finite state machine
+var respawn_step_timer = 0
+var current_respawn_step = 0
+var respawn_timers = [
+	{"name":"crane moving to center screen", "duration":0.6},
+	{"name":"crane pauses before descending", "duration":0.2},
+	{"name":"crane moving down", "duration":1.2},
+	{"name":"crane moving back", "duration":0.8},
+	{"name":"transition screen", "duration":1.2},
+	{"name":"player has spawned", "duration":0},
+]
+var default_respawn_timers = respawn_timers
 
+## End death vars
 
-var cam = null
+func respawn():
+	pass
+
 
 func _ready():
 	controls_default = get_parent().controls_default 
 	controls_binded = get_parent().controls_binded
 	cam = get_node("Camera")
 	cam.current = true
-	
+	add_child(crane)
+	crane.visible = false
+	add_child(transition_screen)
+	transition_screen.visible = false
 	pass 
 
 
@@ -91,45 +105,61 @@ func get_input (delta):
 	pass
 
 func _physics_process(delta):
+
 	
 	#play crane animation for death.
-	if (dead and !grabbed_by_crane):
-		anim.play("default")
-		crane_animator.play("moving_right")
-		#crane moves on X axis to player.
-		death_animation_time_x += delta
-		crane.position.x = lerp(crane_original_position.x, 0, death_animation_time_x / (death_animation_duration ))
-		#crane pauses for a moment. Plays stop animation
-		if (death_animation_time_x >= death_animation_duration):
-			crane_animator.play("stopping")
-			
-			crane.position.x = 0
-			if (crane_pause_time < crane_pause_duration):
-				crane_pause_time += delta
-			else:
-				crane_animator.play("descending")
-				
-			#crane descends on player.
-				death_animation_time_y += delta
-				crane.position.y = lerp(crane_original_position.y, player_head_height_difference, death_animation_time_y / death_animation_duration)
-				if (death_animation_time_y >= death_animation_duration):
+	# todo tidy this up. Tons of if statements here that could be replaced with a switch & variables that could be an array.
+	if (dead):
+		respawn_step_timer += delta
+		var step_duration = respawn_timers[current_respawn_step].duration
+		match (current_respawn_step):
+			0:
+				# Crane moves on X axis to player.
+				anim.play("default")
+				crane_animator.play("moving_right")
+				crane.position.x = lerp(crane_original_position.x, 0, respawn_step_timer / step_duration)
+				if (respawn_step_timer >= step_duration):
+					crane_animator.play("stopping")
+					crane.position.x = 0
+			1:
+				# Crane pauses for a moment. Plays stop animation from last step (so that it doesn't repeat the animation twice)
+				if (respawn_step_timer >= step_duration):
+					crane_animator.play("descending")
+			2:
+				# Crane descends on player.
+				crane.position.y = lerp(crane_original_position.y, player_head_height_difference, respawn_step_timer / step_duration)
+				if (respawn_step_timer >= step_duration):
 					crane.position.y = player_head_height_difference
 					crane_animator.play("grabbing")
-					grabbed_by_crane = true
-		return false
-	elif (grabbed_by_crane):
-		#move the player off the screen and then we can put him back to the checkpoint.
-		crane_return_time += delta;
-		self.position.y = lerp (self.position.y, -300, crane_return_time / crane_return_duration)
-		if (crane_return_time > crane_return_duration):
-			#transition_screen.visible = true;
-			var mat = transition_screen.get_material()
-			transition_screen_time += delta
-			mat.set_shader_param("Cutoff", lerp(1, 0, transition_screen_time / transition_screen_duration))
-			
-			#TODO: RESPAWN.
-			
-	#end crane animation / death section.
+			3:
+				#move the player off the screen and then we can put him back to the checkpoint.
+				self.position.y = lerp (self.position.y, -300, respawn_step_timer / step_duration)
+
+			4:
+				# Supposed to make the screen transition to black so that we can whisk the player back to the spawn point.
+				transition_screen.visible = true;
+				var mat = transition_screen.get_material()
+				mat.set_shader_param("Cutoff", lerp(1, 0, respawn_step_timer / step_duration))
+				
+			5:
+				# Wow! We did it!
+				self.position = current_respawn_point
+				self.position.y -= 50
+				self.dead = false
+				var mat = transition_screen.get_material()
+				mat.set_shader_param("Cutoff", 1)
+				respawn_timers = default_respawn_timers
+				current_respawn_step = 0
+				respawn_step_timer = 0
+				crane.position = crane_original_position
+				crane.visible = false
+
+		if (respawn_step_timer >= step_duration):
+			current_respawn_step += 1
+			respawn_step_timer = 0
+		return false # prevent player from moving while this is happening.
+
+	# End crane animation / death section. This turned out to be a finite state machine and a half. Maybe if I understood godot animations it'd have been easier.
 	##############################################
 	
 	get_input(delta)
@@ -161,6 +191,8 @@ func _physics_process(delta):
 	CheckCollisions()
 	pass
 
+
+
 func CheckCollisions ():
 	for i in get_slide_count():
 		var collision = get_slide_collision(i)
@@ -172,17 +204,10 @@ func CheckCollisions ():
 func Die ():
 	crane.position = Vector2(-270,-120)
 	crane_original_position = Vector2(-270,-120)
-	add_child(crane)
-	add_child(transition_screen)
-	#transition_screen.visible = false
+	crane.visible = true
 	
 	print ("cam ", cam.get_global_transform())
 	# todo make camera go up a bit and follow the crane down.
-	
-	
-	
-	#get_parent().Spawn_Player()
-	#queue_free()
 	pass
 
 
