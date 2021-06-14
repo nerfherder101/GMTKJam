@@ -41,9 +41,15 @@ shape = SubResource( 1 )
 [node name="Spawn2" type="Area2D" parent="."]
 collision_layer = 0
 script = ExtResource( 5 )
+controls_binded = {
+"ui_left": "none",
+"ui_right": "death",
+"ui_up": "none"
+}
+control_panel = "res://Prefabs//Binding2.tscn"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Spawn2"]
-position = Vector2( 539.37, 254.362 )
+position = Vector2( 541.372, 253.695 )
 shape = SubResource( 1 )
 
 [connection signal="area_entered" from="Spawn" to="Spawn" method="_on_Area2D_area_entered"]

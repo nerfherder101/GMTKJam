@@ -118,6 +118,7 @@ func _physics_process(delta):
 				anim.play("default")
 				crane_animator.play("moving_right")
 				crane.position.x = lerp(crane_original_position.x, 0, respawn_step_timer / step_duration)
+				crane.position.x = lerp(crane_original_position.x, 0, respawn_step_timer / step_duration)
 				if (respawn_step_timer >= step_duration):
 					crane_animator.play("stopping")
 					crane.position.x = 0
@@ -197,7 +198,6 @@ func CheckCollisions ():
 	for i in get_slide_count():
 		var collision = get_slide_collision(i)
 		if (collision.collider.name == "Hazards" && !dead):
-			dead = true
 			Die()
 	pass
 
@@ -205,6 +205,9 @@ func Die ():
 	crane.position = Vector2(-270,-120)
 	crane_original_position = Vector2(-270,-120)
 	crane.visible = true
+	current_respawn_step = 0
+	
+	dead = true
 	
 	print ("cam ", cam.get_global_transform())
 	# todo make camera go up a bit and follow the crane down.
