@@ -134,13 +134,11 @@ func _physics_process(delta):
 			3:
 				#move the player off the screen and then we can put him back to the checkpoint.
 				self.position.y = lerp (self.position.y, -300, respawn_step_timer / step_duration)
-
 			4:
 				# Supposed to make the screen transition to black so that we can whisk the player back to the spawn point.
 				transition_screen.visible = true;
 				var mat = transition_screen.get_material()
 				mat.set_shader_param("Cutoff", lerp(1, 0, respawn_step_timer / step_duration))
-				
 			5:
 				# Wow! We did it!
 				self.position = current_respawn_point
