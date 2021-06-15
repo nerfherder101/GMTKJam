@@ -41,6 +41,7 @@ onready var transition_screen = transition_screen_prefab.instance()
 var respawn_step_timer = 0
 var current_respawn_step = 0
 var respawn_timers = [
+	{"name":"player falling", "duration": 1},
 	{"name":"crane moving to center screen", "duration":0.6},
 	{"name":"crane pauses before descending", "duration":0.2},
 	{"name":"crane moving down", "duration":1.2},
@@ -111,8 +112,18 @@ func _physics_process(delta):
 	# todo tidy this up. Tons of if statements here that could be replaced with a switch & variables that could be an array.
 	if (dead):
 		respawn_step_timer += delta
-		var step_duration = respawn_timers[current_respawn_step].duration
+		var step_duration = respawn_timers[current_respawn_step + 1].duration
 		match (current_respawn_step):
+			-1:
+				print ("on step -1")
+				velocity.y += G
+				velocity = move_and_slide(velocity, Vector2.UP)
+				print(velocity.y)
+				if (velocity.y == 0):
+					current_respawn_step += 1
+					respawn_step_timer = 0
+					SetupCrane()
+					
 			0:
 				# Crane moves on X axis to player.
 				anim.play("default")
@@ -202,10 +213,8 @@ func CheckCollisions ():
 	pass
 
 func Die ():
-	crane.position = Vector2(-270,-120)
-	crane_original_position = Vector2(-270,-120)
-	crane.visible = true
-	current_respawn_step = 0
+	
+	current_respawn_step = -1
 	
 	dead = true
 	
@@ -213,5 +222,10 @@ func Die ():
 	# todo make camera go up a bit and follow the crane down.
 	pass
 
+
+func SetupCrane ():
+	crane.position = Vector2(-270,-120)
+	crane_original_position = Vector2(-270,-120)
+	crane.visible = true
 
 
